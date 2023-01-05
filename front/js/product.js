@@ -10,8 +10,6 @@ let a = fetch("http://localhost:3000/api/products/"+ productId)
         image.src = product.imageUrl;
         document.getElementsByClassName("item__img")[0].appendChild(image)
         ;
-        
-
     })
 
 
