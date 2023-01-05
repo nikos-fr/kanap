@@ -26,3 +26,7 @@ let a = fetch("http://localhost:3000/api/products")
       console.log(err)
   })
 console.log(a)
+
+
+
+              
