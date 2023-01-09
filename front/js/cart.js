@@ -1,5 +1,5 @@
 // cart
-let b = fetch("http://localhost:3000/api/products")
+let a = fetch("http://localhost:3000/api/products")
   .then(res => res.json())
   .then(cart => {
     let display = ''
@@ -30,7 +30,7 @@ let b = fetch("http://localhost:3000/api/products")
     }
     document.querySelector("#cart__items").innerHTML = display
 })
-.catch(err => {
-  console.log("dans le catch")
-  console.log(err)
-})
+    .catch(err => {
+        console.log("Error fetch request :")
+        console.log(err)
+    })

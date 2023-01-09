@@ -4,7 +4,8 @@
 // 3.1 pointer sur element items
 // 3.2 INJECTER DANS LE DOM
 
-let a = fetch("http://localhost:3000/api/products")
+const url = "http://localhost:3000/api/products";
+let requestProducts = fetch(url)
   .then(res => res.json())
     .then(data => {
         let display = ''
@@ -22,11 +23,7 @@ let a = fetch("http://localhost:3000/api/products")
         document.querySelector("#items").innerHTML = display
     })
   .catch(err => {
-      console.log("dans le catch")
+      console.log("Error fetch request :")
       console.log(err)
   })
-console.log(a)
-
-
-
-              
+console.log(requestProducts) 
