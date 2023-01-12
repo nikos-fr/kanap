@@ -26,6 +26,5 @@ let requestProduct = fetch("http://localhost:3000/api/products/" + productId)
 // clic du bouton ajouter au panier 
 const addToCart = document.querySelector(".item__content__addButton");
 addToCart.addEventListener('click', () => {
-  const localStorage = window.localStorage.getItem("product, quantity, color");
-  console.log(localStorage);
+  console.log("click");
 });
