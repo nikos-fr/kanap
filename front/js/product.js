@@ -38,18 +38,15 @@ const quantity = document.querySelector("#quantity").value
 const color = document.querySelector("#colors").value
 const price = document.querySelector("#price").value
 const title = document.querySelector("#title").value
+const img = document.getElementsByClassName("item__img").value
 
 function saveOrder(color, quantity){
-  // const quantity = document.querySelector(#quantity).value
-  // const color = document.querySelector(#colors).value
-  // const price = document.querySelector(#price).value
   const key = '${productId}_${color}'
   const value = {
       color: color,
       quantity: quantity,
       price: price,
-      imageUrl: XX,
-      altTxt: XX,
+      imageUrl: img,
       name: title
   }
   localStorage.setItem(key, JSON.stringify(value))
