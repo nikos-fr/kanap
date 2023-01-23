@@ -1,73 +1,56 @@
-// récupération de l'url avec window.location.href qui permet de récupérer l'url de la page courante
+// Recuperation de l'id du kanap selectionner par le client
+const url = window.location.href;
+const newUrl = new URL(url);
+const productId = newUrl.searchParams.get("id");
 
-const newLocal = new URL(window.location.href);
-
-//création d'une variable id pour récupérer les articles
-
-const productId = newLocal.searchParams.get(`id`);
-
-// récupération des différents articles
-try {
-  fetch("http://127.0.0.1:3000/api/products/" + productId)
-    .then((rep) => rep.json())
-    .then((article) => {
-      // récupération des informations des produits
-
-      document.querySelector(
-        ".item__img"
-      ).innerHTML = `<img src="${article.imageUrl}" alt="${article.altTxt}">`;
-      document.querySelector("#title").innerHTML = article.name;
-      document.querySelector("#price").innerHTML = article.price;
-      document.querySelector("#description").innerHTML = article.description;
-
-      document.querySelector("option").value = "default";
-      document.title = article.name;
-      // récupération des couleurs des produits avec une boucle afin d'afficher toute les couleurs
-      for (let couleur of article.colors) {
-        // création d'une constante color et récupération de la balise html <option> dans laquelle on injecte la couleur
-        const color = `<option value="${couleur}">${couleur}</option>`;
-
-        // insertion des différentes couleurs
-        document
-          .querySelector("#colors")
-          .insertAdjacentHTML("beforeend", color);
-      }
-    });
-} catch (err) {
-  console.log(err);
-}
-
-//  Selection bouton
-const addToCart = document.querySelector("#addToCart");
-
-// écouter le click du bouton addToCart
-addToCart.addEventListener("click", () => {
-  // sélectionner les valeur des quantités et couleurs
-  const quantity = document.querySelector("#quantity").value;
-  const color = colors.value;
-  const id = productId._id;
-
-  // condition des valeurs au click à la selection du client
-  if (color !== "default" && quantity >= 1 && quantity <= 100) {
-    let basket = JSON.parse(localStorage.getItem("basket")) || [];
-    // récupérer les propriétés de l'article en objet
-    let product = {
-      id: productId,
-      color: color,
-      quantity: parseInt(quantity),
-    };
-    // rajouter un article mm id mm couleur dans le localstorage sur une meme ligne
-    let cartFound = basket.find(
-      (p) => p.id == product.id && p.color == product.color
-    );
-    if (cartFound != undefined) {
-      cartFound.quantity += parseInt(quantity);
+// appel de l'api
+let requestProduct = fetch("http://localhost:3000/api/products/" + productId)
+  // promesse de l'api
+  .then(res => res.json())
+  .then(product => {
+    //creation du  dom de la page
+    let image = document.createElement('img')
+    image.src = product.imageUrl;
+    document.getElementsByClassName("item__img")[0].appendChild(image);
+    document.getElementById("title").innerText = product.name;
+    document.getElementById("price").innerText = product.price;
+    document.getElementById("description").innerText = product.description;
+    // choix de la couleurs 
+    for (const color of product.colors) {
+      let colorOption = document.createElement("option")
+      colorOption.innerText = color
+      document.getElementById("colors").appendChild(colorOption)
+      console.log(colorOption);
     }
-    // récupère le panier dans le localstorage
-    else basket.push(product);
-    // permet de rajouter les valeurs sélectionnées dans le localst
-    localStorage.setItem("basket", JSON.stringify(basket));
-  } else {
-    alert("Veuillez sélectionnez une couleur et une quantité valide");
+  })
+
+// clic du bouton ajouter au panier 
+const addToCart = document.querySelector(".item__content__addButton");
+addToCart.addEventListener('click', saveOrder)
+
+
+// 1- Créer une fonction pour stocker la key et value pour chaques produit et de push en localstorage
+// 2- Executer la fonction quand la personne click sur le CTA
+// 3- Vérifier qu'une option est bien séléctionné et une quantitée avant le click / Sinon envoyer une alerte
+// 4- Créer une fonction globale avec queryselector pour prendre les valeurs et vérifier que toutes les conditions sont bien remplies avant du push en local storage
+
+const quantity = document.querySelector("#quantity").value
+const color = document.querySelector("#colors").value
+const price = document.querySelector("#price").value
+const title = document.querySelector("#title").value
+
+function saveOrder(color, quantity){
+  // const quantity = document.querySelector(#quantity).value
+  // const color = document.querySelector(#colors).value
+  // const price = document.querySelector(#price).value
+  const key = '${productId}_${color}'
+  const value = {
+      color: color,
+      quantity: quantity,
+      price: price,
+      imageUrl: XX,
+      altTxt: XX,
+      name: title
   }
-});
+  localStorage.setItem(key, JSON.stringify(value))
+}
