@@ -61,7 +61,7 @@ addToCart.addEventListener("click", () => {
       (p) => p.id == product.id && p.color == product.color
     );
     if (cartFound != undefined) {
-      cartFound.quantity += parseInt(quantity);
+      cartFound.quantity = parseInt(quantity);
     }
     // récupère le panier dans le localstorage
     else basket.push(product);
