@@ -29,6 +29,7 @@ function getBasketInfo() {
                 localStorage.setItem("basket", JSON.stringify(basket.filter(e=> e!= product)))
                  getBasketInfo()
             })
+            // surveille si la quantiter change il le change dans le local storage
             input.addEventListener("change",()=>{
                 const newQuantity = input.value
                 product.quantity = newQuantity
