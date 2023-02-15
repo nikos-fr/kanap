@@ -5,11 +5,11 @@
 // 3.2 INJECTER DANS LE DOM
 const url = "http://localhost:3000/api/products";
 let requestProducts = fetch(url)
-  .then(res => res.json())
-    .then(data => {
-        let display = ''
-        for(let article of data){
-            display +=`
+  .then((res) => res.json())
+  .then((data) => {
+    let display = "";
+    for (let article of data) {
+      display += `
             <a href="./product.html?id=${article._id}">
             <article>
               <img src="${article.imageUrl}" alt="${article.altTxt}">
@@ -17,15 +17,13 @@ let requestProducts = fetch(url)
               <p class="productDescription">${article.description}</p>
             </article>
           </a>
-            `
-        }
-        document.querySelector("#items").innerHTML = display
-    })
-  .catch(err => {
-      console.log("Error fetch request :")
-      console.log(err)
+            `;
+    }
+    document.querySelector("#items").innerHTML = display;
+  })
+  .catch((err) => {
+    console.log("Error fetch request :");
+    console.log(err);
   });
 
-console.log(requestProducts) 
-      
-
+console.log(requestProducts);

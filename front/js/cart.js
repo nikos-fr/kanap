@@ -1,81 +1,149 @@
-const cartItems = document.getElementById("cart__items")
+// récupération du mon panier dans le local storage
+const basket = JSON.parse(localStorage.getItem("basket"));
 
-function computeTotal() {
-    const quantity = document.getElementById("totalQuantity")
-    const price = document.getElementById("totalPrice")
-}
-// recuperation du local storage
-function getBasketInfo() {
-    // calculer le nombre article total et leur prix 
-    cartItems.innerHTML = ""
-    const basket = JSON.parse(localStorage.getItem("basket"))
-    console.log(basket);
-    for (let product of basket){
+// Condition pour le cas où le panier est vide ou supprimé
+if (basket === null || basket.length == 0) {
+    alert("votre panier est vide");
+    window.location.href = `http://127.0.0.1:5500/front/html/index.html`;
+} else {
+    // Je fais une boucle pour chaque produit qui se trouvent dans le panier
+    // et je récupère les info qui manque dans l'API avec fetch (prix, image) pour les insérer dans le DOM
+    basket.forEach((product) => {
         fetch("http://127.0.0.1:3000/api/products/" + product.id)
-        .then((rep) => rep.json())
-        .then((article) =>{
-            article.quantity = product.quantity
-            article.colors = product.color
-            totalQuantity += product.quantity
-            totalPrice += product.quantity * article.price
-            // recuperation du dom pour le button suprimer et la quantité 
-            const articleCard = displayArticle(article)
-            const input = articleCard.querySelector("input")
-            const itemQuantity =articleCard.querySelector(".cart__item__content__settings__quantity").querySelector("p")
-            const deleteButton =articleCard.querySelector(".deleteItem")
-            cartItems.appendChild (articleCard)
-            // supression des article dans le panier 
-            deleteButton.addEventListener("click",()=>{
-                localStorage.setItem("basket", JSON.stringify(basket.filter(e=> e!= product)))
-                 getBasketInfo()
-            })
-            // surveille si la quantiter change il le change dans le local storage
-            input.addEventListener("change",()=>{
-                const newQuantity = input.value
-                product.quantity = newQuantity
-                
-                localStorage.setItem("basket", JSON.stringify(basket))
-                itemQuantity.innerText = newQuantity 
-            })
-        })
-        .catch ((err) =>{
-            console.log(err); })   
-    }
-}
+            .then((rep) => rep.json())
+            .then((data) => {
+                // j'indique tout ce que je dois afficher sur ma page
+                let structurebasket = ``;
 
-// creation du dom
-function displayArticle(article) {
-    const articleCard = document.createElement("article")
-    articleCard.setAttribute("class", "cart__item")
-    articleCard.setAttribute("data-id", article.id)
-    articleCard.setAttribute("data-color",article.colors)
-    articleCard.innerHTML = `
+                structurebasket += `
+        <article class="cart__item" data-id="${data._id}" data-color="${product.color}">
     <div class="cart__item__img">
-      <img src="${article.imageUrl}" alt="Photographie d'un canapé">
+      <img src="${data.imageUrl}" alt="${data.altTxt}">
     </div>
     <div class="cart__item__content">
       <div class="cart__item__content__description">
-        <h2>${article.name}</h2>
-        <p>${article.colors}</p>
-        <p>${article.price}€</p>
+        <h2>${data.name}</h2>
+        <p>${product.color}</p>
+        <p>${data.price} €</p>
       </div>
       <div class="cart__item__content__settings">
         <div class="cart__item__content__settings__quantity">
-          <p>${article.quantity}</p>
-          <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${article.quantity}">
+          <p>Qté : </p>
+          <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.quantity}">
         </div>
         <div class="cart__item__content__settings__delete">
           <p class="deleteItem">Supprimer</p>
         </div>
       </div>
     </div>
-    ` 
-    return articleCard
+  </article>
+    `;
+
+                document
+                    .querySelector("#cart__items")
+                    .insertAdjacentHTML("beforeend", structurebasket);
+
+                ////////////////////////////////////// total du prix et du nombre d'article////////////////////////////////////////
+                // Dans cette fonction, je vais récupérer le prix et les quantités total de mon panier,
+                // faire en sorte de pouvoir changer les quantités en mettant à jour le prix total
+                // et pouvoir supprimer ou plusieurs articles et faire la mise à jour
+                async function setTotalPriceQuantity() {
+                    let totalPrice = 0;
+                    let totalQuantity = 0;
+
+                    //  je fais une boucle pour aller chercher les prix et les quantités dans le panier en appelant l'API avec fetch
+                    //  pour faire les totaux et les afficher dans le DOM
+                    for (let product of basket) {
+                        let productPrice = await fetch(
+                            "http://127.0.0.1:3000/api/products/" + product.id
+                        )
+                            .then((rep) => rep.json())
+                            .then((productData) => {
+                                return productData.price;
+                            });
+
+                        totalPrice += productPrice * parseInt(product.quantity);
+                        totalQuantity += parseInt(product.quantity);
+                    }
+
+                    document.querySelector("#totalPrice").textContent =
+                        totalPrice;
+                    document.querySelector("#totalQuantity").textContent =
+                        totalQuantity;
+                }
+
+                setTotalPriceQuantity();
+
+                ///////////////////////// supprimer un article////////////////////////////
+
+                let deleteItems = document.querySelectorAll(".deleteItem");
+                //  je fait une boucle sur le bouton de chaque produit et j'écoute au click les articles que je veux supprimer
+                // en recherchant le parent le plus proche afin de sélectionner les couleur et id
+                for (let move of deleteItems) {
+                    move.addEventListener("click", () => {
+                        let closest = move.closest(".cart__item");
+                        let closestColor = closest.getAttribute("data-color");
+                        let closestId = closest.getAttribute("data-id");
+
+                        // boucle avec condition des couleur et id avecla méthode splice pour retirer les éléments ciblés du tableau
+                        for (let product of basket) {
+                            if (
+                                product.color === closestColor &&
+                                product.id === closestId
+                            ) {
+                                basket.splice(basket.indexOf(product), 1);
+                            }
+                        }
+                        closest.remove();
+
+                        // je change les nouvelles valeurs  dans le localstorage
+                        localStorage.setItem("basket", JSON.stringify(basket));
+
+                        setTotalPriceQuantity();
+                    });
+                }
+
+                ////////////////////////////////changement quantité dans panier///////////////////////////////////////////
+
+                let changeItems = document.querySelectorAll(".itemQuantity");
+                //  boucle sur l'input avec un eventListener change qui permet d'écouter le changement des quantités
+                // en recherchant le parent le plus proche afin de sélectionner les couleur et id
+                for (let input of changeItems) {
+                    input.addEventListener("change", () => {
+                        if (input.value >= 1 && input.value <= 100) {
+                            let closest = input.closest(".cart__item");
+                            let closestColor =
+                                closest.getAttribute("data-color");
+                            let closestId = closest.getAttribute("data-id");
+
+                            for (let product of basket) {
+                                if (
+                                    product.color === closestColor &&
+                                    product.id === closestId
+                                ) {
+                                    product.quantity = parseInt(input.value);
+                                }
+                            }
+
+                            // je change les nouvelles valeurs dans le local storage
+                            localStorage.setItem(
+                                "basket",
+                                JSON.stringify(basket)
+                            );
+
+                            setTotalPriceQuantity();
+                        } else {
+                            window.alert(
+                                "Veuillez saisir une quantité valide entre 1 et 100"
+                            );
+                        }
+                    });
+                }
+            });
+    });
 }
-getBasketInfo()
+//////////////////////////////////////////FORMULAIRE////////////////////////////////////////////////////////
 
-
-// FORMULAIRE 
 const order = document.querySelector("#order");
 const form = document.querySelector(".cart__order__form");
 const champs = document.querySelector(".cart__order__form__question");
@@ -185,10 +253,5 @@ form.addEventListener("submit", (event) => {
         }
 
         sendOrder();
-    } else {
-        alert("Veuillez remplir le formulaire");
-    }
+    } 
 });
-
-
-// faire une fonction qui calcule le prix total et la quantité total du panier 
