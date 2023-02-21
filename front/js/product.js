@@ -8,7 +8,7 @@ const productId = newLocal.searchParams.get(`id`);
 
 // récupération des différents articles
 try {
-  fetch("http://127.0.0.1:3000/api/products/" + productId)
+  fetch("http://localhost:3000/api/products/" + productId)
     .then((rep) => rep.json())
     .then((article) => {
       // récupération des informations des produits
@@ -61,7 +61,11 @@ addToCart.addEventListener("click", () => {
       (p) => p.id == product.id && p.color == product.color
     );
     if (cartFound != undefined) {
-      cartFound.quantity = parseInt(quantity);
+      cartFound.quantity += parseInt(quantity);
+      if (cartFound.quantity > 100) {
+        alert ("Vous ne pouvez pas avoir plus de 100 canapé")
+        cartFound.quantity = 100
+      }
     }
     // récupère le panier dans le localstorage
     else basket.push(product);

@@ -4,7 +4,7 @@ const basket = JSON.parse(localStorage.getItem("basket"));
 // Condition pour le cas où le panier est vide ou supprimé
 if (basket === null || basket.length == 0) {
     alert("votre panier est vide");
-    window.location.href = `http://127.0.0.1:5500/front/html/index.html`;
+    window.location.href = `./index.html`;
 } else {
     // Je fais une boucle pour chaque produit qui se trouvent dans le panier
     // et je récupère les info qui manque dans l'API avec fetch (prix, image) pour les insérer dans le DOM
@@ -55,7 +55,7 @@ if (basket === null || basket.length == 0) {
                     //  pour faire les totaux et les afficher dans le DOM
                     for (let product of basket) {
                         let productPrice = await fetch(
-                            "http://127.0.0.1:3000/api/products/" + product.id
+                            "http://localhost:3000/api/products/" + product.id
                         )
                             .then((rep) => rep.json())
                             .then((productData) => {
@@ -228,7 +228,7 @@ form.addEventListener("submit", (event) => {
         //  appel de l'API avec fetch et envoie du formulaire avec la méthode post dans la page confirmation
         async function sendOrder() {
             let response = await fetch(
-                "http://127.0.0.1:3000/api/products/order",
+                "http://localhost:3000/api/products/order",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -247,7 +247,7 @@ form.addEventListener("submit", (event) => {
                 moveLocalStorage("basket");
 
                 // envoie des informations dans la page confirmation
-                window.location.href = `http://127.0.0.1:5500/front/html/confirmation.html?orderId=${result.orderId}`;
+                window.location.href = `./confirmation.html?orderId=${result.orderId}`;
             }
             console.log(response);
         }
