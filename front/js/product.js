@@ -62,9 +62,10 @@ addToCart.addEventListener("click", () => {
     );
     if (cartFound != undefined) {
       cartFound.quantity += parseInt(quantity);
+      // que les personne ne puisse pas mettre plus de 100 article dans le panier
       if (cartFound.quantity > 100) {
-        alert ("Vous ne pouvez pas avoir plus de 100 canapé")
-        cartFound.quantity = 100
+        alert("Vous ne pouvez pas avoir plus de 100 canapé");
+        cartFound.quantity = 100;
       }
     }
     // récupère le panier dans le localstorage

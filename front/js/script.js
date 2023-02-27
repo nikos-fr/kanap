@@ -23,7 +23,4 @@ let requestProducts = fetch(url)
   })
   .catch((err) => {
     console.log("Error fetch request :");
-    console.log(err);
   });
-
-console.log(requestProducts);
